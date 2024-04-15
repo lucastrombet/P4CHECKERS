@@ -1,0 +1,142 @@
+Mapa padrão
+
+2D 32 2D 32 2D 32 0A
+30 2D 30 2D 30 2D 0A
+2D 30 2D 30 2D 30 0A
+30 2D 30 2D 30 2D 0A
+2D 30 2D 30 2D 30 0A
+31 2D 31 2D 31 2D 0A 0A;
+
+
+entrada  1 1 2 2  
+
+verificar  1 1
+
+if bit<8> linha = 31
+int linha_int = 1
+
+
+BOOL T valido = (BOOL_T)(bit<1>) ((linha_int + coluna_int) % 2)
+
+if (valido == 0){
+	verificar jogada()
+}
+else{
+	jogada invalida()
+} 
+
+verificar jogada(linha_partida, coluna_partida, linha_destino, coluna_destino, turn){
+
+bool verificar partida(linha partida, coluna partida, turn);
+bool verificar jogada_comida (linha_partida, coluna_partida, linha_destino, coluna_destino);
+bool verificar linhas(linha partida, linha destino);
+bool verificar colunas(coluna partida, coluna destino, turn);
+
+bit<8> teste_destino = achar_posição(linha destino, coluna destino);
+if (teste_destino == 0x30){
+	mover_peça(linha_partida, coluna_partida, linha_destino, coluna_destino)
+}
+
+
+
+}
+
+
+bool verificar partida(linha partida, coluna partida, turn){
+
+	//verificar peças brancas
+	if (turn == 0){
+		bit<8> teste = achar_posição(linha partida, coluna partida)
+		if (teste == 0x31)
+			return 1
+		return 0
+	}
+	//verificar peças pretas
+	else{
+		bit<8> teste = achar_posição(linha partida, coluna partida)
+		if (teste == 0x32)
+			return 1
+		return 0
+	}
+
+}
+
+
+
+bool verificar linhas(linha partida, linha destino){
+
+	BOOL
+	if (linha_destino > linha partida){
+		int eq = linha destino - linha partida 
+		if eq == 1
+			return 1;
+	} 
+	else{
+		int eq = linha_partida - linha_destino
+		if eq == 1
+			return 1
+	}
+	
+	return 0;
+
+}
+bool verificar colunas(coluna partida, coluna destino, turn){
+
+	//vez das brancas
+	if (turn == 0){
+		int eq = coluna_destino - coluna_partida
+		if eq == 1
+			return 1;
+	}
+	//vez das pretas
+	else{
+		int eq = coluna_partida - coluna_destino
+		if eq == 1
+			return 1
+	}
+	
+	return 0;
+
+}
+
+bool verificar_jogada_comida (linha_partida, coluna_partida, linha_destino, coluna_destino, turn){
+
+	verificar_jogada_comida_linha(linha_partida, linha_destino);
+	verificar_jogada_comida_coluna(coluna_partida, coluna_destino, turn);
+
+}
+
+bool verificar_jogada_comida_linha(linha_partida, linha_destino){
+
+	if (linha_destino > linha partida){
+		int eq = linha destino - linha partida 
+		if eq == 2
+			return 1;
+	} 
+	else{
+		int eq = linha_partida - linha_destino
+		if eq == 2
+			return 1
+	}
+	
+	return 0;
+
+}
+
+bool verificar_jogada_comida_coluna(coluna_partida, coluna_destino, turn){
+
+	//vez das brancas
+	if (turn == 0){
+		int eq = coluna_destino - coluna_partida
+		if eq == 2
+			return 1;
+	}
+	//vez das pretas
+	else{
+		int eq = coluna_partida - coluna_destino
+		if eq == 2
+			return 1
+	}
+	return 0;
+}
+
