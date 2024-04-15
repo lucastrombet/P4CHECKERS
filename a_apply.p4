@@ -208,3 +208,23 @@ else{
 		send_error_msg(2);
 	}
 }*/
+
+
+/* Verificador de posição
+
+int verify(int linha, int coluna){
+
+	int pos = linha * 8 + coluna;
+	bit<8> map_pos = map[pos:pos+7];
+	if (map_pos == 0x31){
+		return 1;
+	}
+	else if (map_pos == 0x32){
+		return 2;
+	}
+	else{
+		return 0;
+	}
+
+}
+*/
