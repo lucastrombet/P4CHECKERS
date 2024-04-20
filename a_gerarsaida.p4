@@ -180,3 +180,96 @@ action iniciarmapa(){
 	
 	
 }
+
+action verificarnumero(inout int<8> valida_num, in bit<8> num){
+	if(
+		(num == 0x38) ||
+		(num == 0x31) ||
+		(num == 0x32) ||
+		(num == 0x33) ||
+		(num == 0x34) ||
+		(num == 0x35) ||
+		(num == 0x36) ||
+		(num == 0x37) 
+		
+		){
+		valida_num = 0;
+	}else{
+		valida_num = 1; 
+	}
+	
+}
+
+action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
+	
+	bit<8> rowin;
+	bit<8> colin;
+	bit<8> rowout;
+	bit<8> colout;
+	
+	int<8> valida_rowin;
+	int<8> valida_colin;
+	int<8> valida_rowout;
+	int<8> valida_colout;
+	
+	rowin = msg[63:56];
+	colin = msg[47:40];
+	rowout = msg[31:24];
+	colout = msg[15:8];
+	
+	verificarnumero(valida_rowin, rowin);
+	verificarnumero(valida_colin, colin);
+	verificarnumero(valida_rowout, rowout);
+	verificarnumero(valida_colout, colout);
+	
+	int<8> vj;
+	vj = valida_rowin + valida_colin + valida_rowout + valida_colout;
+	valida_jogada = (BOOL_T)(bit<1>)(vj == 0);
+	//verifica_soma()
+	//verifica_origem()
+	//verifica_destino()
+}
+
+
+
+/*verifica_soma(bit<8> row, bit<8> col){
+	if (row[0] | col[0]) == 0){
+		return 1;
+	}
+}
+
+int verifica origem(int row, int col){
+	bit<8> ori_teste;
+	checkerboard.read(ori_teste, (row-1)*8 + col);
+	//Origem branca
+	if(turn == 0){
+		if(ori_teste == 0x31){
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
+	//Origem preta
+	else{
+		if(ori_teste == 0x32){
+			return 1;
+		}
+		else{
+			return 0;
+		}
+	}
+}
+
+int verifica destino(int row, int col){
+	bit<8> dest_teste;
+	checkerboard.read(ori_teste, (row-1)*8 + col);
+	//Verifica se o espaço está vazio
+	if (dest_teste == 0x30){
+		return 1;
+	}
+	
+}
+*/
+
+

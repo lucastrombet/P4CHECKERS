@@ -62,10 +62,20 @@ if (hdr.genhdr_uid1.isValid()){
 		else{
 			//Vez das Brancas
 			if(turn == 0 ){
-				//Verificar tamanho da entrada 
-				if(hdr.genhdr_uid1.msg_in.size == 7){
-					log_msg("Entrou aqui");
+				//Verificar tamanho da entrada?
+				
+				//verificar jogada
+				BOOL_T jogada_valida;
+				jogada_valida = 0;
+				verificarjogada(jogada_valida, hdr.genhdr_uid1.msg_in);
+				
+				if (jogada_valida == 1) {
+					log_msg("Jogada VALIDA");
 				}
+				else{
+					log_msg("Jogada INVALIDA");
+				}
+				
 				if (l1==1){
 					hdr.genhdr_uid2.msg_out = 0x2D322D322D320A302D302D302D0A2D302D302D300A302D302D302D0A2D312D302D300A302D312D312D0A0A;
 					teste = (bit<1>) 1;
