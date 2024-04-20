@@ -63,8 +63,9 @@ register<bit<1>>(1) checkers_turn;
 register<bit<1>>(1) jogo_iniciado;
 //verificador de jogo iniciado
 
-
-register<bit<376>>(1) map;
+register<bit<8>>(64) checkerboard;
+//register<bit<376>>(1) map;
+//register<bit<8>>(18) map2;
 //map.write(0, 0x2D322D322D320A302D302D302D0A2D302D302D300A302D302D302D0A2D312D302D300A302D312D312D0A0A);
 
 struct metadata {
@@ -205,6 +206,9 @@ control SendBack(inout headers hdr,
 control MyIngress(inout headers hdr,
                   inout metadata meta,
                   inout standard_metadata_t standard_metadata) {
+
+	#include "a_gerarsaida.p4"
+
     
     /*action set_eport(EGRESS_PORT_T port){
         standard_metadata.egress_spec = port;
