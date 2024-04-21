@@ -200,6 +200,57 @@ action verificarnumero(inout int<8> valida_num, in bit<8> num){
 	
 }
 
+action bittoint(inout int<8>saida, in bit<8> entrada){
+	
+	if(entrada == 0x31) {saida = 1;}
+	else if(entrada == 0x32) {saida = 2;}
+	else if(entrada == 0x33) {saida = 3;}
+	else if(entrada == 0x34) {saida = 4;}
+	else if(entrada == 0x35) {saida = 5;}
+	else if(entrada == 0x36) {saida = 6;}
+	else if(entrada == 0x37) {saida = 7;}
+	else if(entrada == 0x38) {saida = 8;}
+	
+}
+
+action verificaorigem(inout BOOL_T teste,in bit<8> rowin, in bit<8> colin){
+	
+	int<8> rowint;
+	int<8> colint;
+	bittoint(rowint, rowin);
+	bittoint(colint, colin);
+	bit<8> ori_teste;
+	bit<32> pos;
+	pos =(bit<32>) (rowint-1)*8 + colint-1;
+	checkerboard.read(ori_teste, pos);
+	BOOL_T turn = (BOOL_T)(bit<1>) teste ;
+	//Origem branca
+	if(turn == 0){
+		teste = (BOOL_T)(bit<1>)(ori_teste == 0x31);
+	}
+	//Origem preta
+	else{
+		teste = (BOOL_T)(bit<1>)(ori_teste == 0x32);
+	}
+		
+}
+
+action verificadestino(inout BOOL_T teste, in bit<8> rowout, in bit<8> colout){
+	
+	int<8> rowint;
+	int<8> colint;
+	bit<8> ori_teste;
+	bittoint(rowint, rowout);
+	bittoint(colint, colout);
+	
+	bit<32> pos;
+	pos =(bit<32>) (rowint-1)*8 + colint-1;
+	checkerboard.read(ori_teste, pos);
+	teste = (BOOL_T)(bit<1>)(ori_teste == 0);
+		
+}
+
+
 action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 	
 	bit<8> rowin;
@@ -225,9 +276,19 @@ action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 	int<8> vj;
 	vj = valida_rowin + valida_colin + valida_rowout + valida_colout;
 	valida_jogada = (BOOL_T)(bit<1>)(vj == 0);
-	//verifica_soma()
-	//verifica_origem()
-	//verifica_destino()
+	
+	BOOL_T verori;
+	BOOL_T verdest;
+	
+	verificaorigem(verori, rowin, colin);
+	verificadestino(verdest, rowout, colout);
+	
+	BOOL_T verfin;
+	
+	verfin = (BOOL_T)(bit<1>)(verdest == verori);
+	
+	valida_jogada = (BOOL_T)(bit<1>)(valida_jogada == verfin);
+
 }
 
 
@@ -240,7 +301,7 @@ action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 
 int verifica origem(int row, int col){
 	bit<8> ori_teste;
-	checkerboard.read(ori_teste, (row-1)*8 + col);
+	checkerboard.read(ori_teste, (row-1)*8 + col-1);
 	//Origem branca
 	if(turn == 0){
 		if(ori_teste == 0x31){
