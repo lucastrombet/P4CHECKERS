@@ -1,4 +1,4 @@
-action gerarsaida(inout bit<640> saida){
+action gerarsaida(inout bit<672> saida){
 	bit<8> item0; bit<8> item1;	bit<8> item2; bit<8> item3; bit<8> item4; bit<8> item5; bit<8> item6; bit<8> item7; bit<8> item8; bit<8> item9;
 	bit<8> item10; bit<8> item11; bit<8> item12; bit<8> item13; bit<8> item14; bit<8> item15; bit<8> item16; bit<8> item17; bit<8> item18; bit<8> item19;
 	bit<8> item20; bit<8> item21; bit<8> item22; bit<8> item23; bit<8> item24; bit<8> item25; bit<8> item26; bit<8> item27; bit<8> item28; bit<8> item29;
@@ -81,14 +81,15 @@ action gerarsaida(inout bit<640> saida){
 	checkerboard.read(item63 ,63);
 	
 	
-	saida = item0 ++ item1 ++ item2 ++ item3 ++ item4 ++ item5 ++ item6 ++ item7 ++ (bit<16>)0x0D0A ++ 	
+	saida = (bit<16>)0x0D0A ++ item0 ++ item1 ++ item2 ++ item3 ++ item4 ++ item5 ++ item6 ++ item7 ++ (bit<16>)0x0D0A ++ 	
 			item8 ++ item9 ++ item10 ++ item11 ++ item12 ++ item13 ++ item14 ++ item15 ++ (bit<16>)0x0D0A ++ 
 			item16 ++ item17 ++ item18 ++ item19 ++ item20 ++ item21 ++ item22 ++ item23 ++ (bit<16>)0x0D0A ++ 
 			item24 ++ item25 ++ item26 ++ item27 ++ item28 ++ item29 ++ item30 ++ item31 ++ (bit<16>)0x0D0A ++ 	
 			item32 ++ item33 ++ item34 ++ item35 ++ item36 ++ item37 ++ item38 ++ item39 ++ (bit<16>)0x0D0A ++ 	
 			item40 ++ item41 ++ item42 ++ item43 ++ item44 ++ item45 ++ item46 ++ item47 ++ (bit<16>)0x0D0A ++ 	
 			item48 ++ item49 ++ item50 ++ item51 ++ item52 ++ item53 ++ item54 ++ item55 ++ (bit<16>)0x0D0A ++ 	
-			item56 ++ item57 ++ item58 ++ item59 ++ item60 ++ item61 ++ item62 ++ item63 ++ (bit<16>)0x0D0A; 
+			item56 ++ item57 ++ item58 ++ item59 ++ item60 ++ item61 ++ item62 ++ item63 ++ (bit<16>)0x0D0A ++ (bit<16>)0x0D0A
+			; 
 			
 	
 }
@@ -200,6 +201,16 @@ action verificarnumero(inout int<8> valida_num, in bit<8> num){
 	
 }
 
+action inttobit(inout bit<32> bitout, in int<8> intin){
+	
+	int<32> inttest = (int<32>) intin;
+	bitout = (bit<32>) inttest;
+	
+}
+
+
+
+
 action bittoint(inout int<8>saida, in bit<8> entrada){
 	
 	if(entrada == 0x31) {saida = 1;}
@@ -213,7 +224,7 @@ action bittoint(inout int<8>saida, in bit<8> entrada){
 	
 }
 
-action verificaorigem(inout BOOL_T teste,in bit<8> rowin, in bit<8> colin){
+action verificaorigem(inout BOOL_T verif,in bit<8> rowin, in bit<8> colin){
 	
 	int<8> rowint;
 	int<8> colint;
@@ -221,38 +232,164 @@ action verificaorigem(inout BOOL_T teste,in bit<8> rowin, in bit<8> colin){
 	bittoint(colint, colin);
 	bit<8> ori_teste;
 	bit<32> pos;
-	pos =(bit<32>) (rowint-1)*8 + colint-1;
+	int<8> posint;
+	
+	/*Posicao array*/ 
+	posint = (rowint-1)*8 + colint-1;
+	inttobit(pos , posint);
+	/*LOGS*/
+	log_msg("Rowint {}", {rowint});
+	log_msg("Colint {}", {colint});
+	log_msg("Posint {}", {posint});
+	
+	/*Busca array*/
 	checkerboard.read(ori_teste, pos);
-	BOOL_T turn = (BOOL_T)(bit<1>) teste ;
+	
+	log_msg("Origem {}", {ori_teste});
+	
+	/*Busca turno*/
+	bit<1> teste_verificaturno;
+	checkers_turn.read(teste_verificaturno, 0);
+	BOOL_T turn = (BOOL_T)(bit<1>) teste_verificaturno ;
+	
 	//Origem branca
 	if(turn == 0){
-		teste = (BOOL_T)(bit<1>)(ori_teste == 0x31);
+		verif = (BOOL_T)(bit<1>)(ori_teste == 0x31);
 	}
 	//Origem preta
 	else{
-		teste = (BOOL_T)(bit<1>)(ori_teste == 0x32);
+		verif = (BOOL_T)(bit<1>)(ori_teste == 0x32);
 	}
 		
 }
 
-action verificadestino(inout BOOL_T teste, in bit<8> rowout, in bit<8> colout){
+action acharadversario(inout bit<8> adversario, in int<8> posadv){
+	bit<32> posadvb;
+	//bit<8> adversario;
+	inttobit(posadvb , posadv);
+	checkerboard.read(adversario, posadvb);
+	log_msg("Adversario {}", {adversario});
+}
+
+
+
+
+action verificadestino(inout BOOL_T verif, in bit<8> rowout, in bit<8> colout, in bit<8> rowin, in bit<8> colin){
 	
+	int<8> rowinint;
+	int<8> colinint;
 	int<8> rowint;
 	int<8> colint;
-	bit<8> ori_teste;
+	bit<8> ori_teste;	
 	bittoint(rowint, rowout);
 	bittoint(colint, colout);
-	
+	bittoint(rowinint, rowin);
+	bittoint(colinint, colin);
 	bit<32> pos;
-	pos =(bit<32>) (rowint-1)*8 + colint-1;
+	int<8> posint;
+	posint = (rowint-1)*8 + colint-1;
+	log_msg("Rowint {}", {rowint});
+	log_msg("Colint {}", {colint});
+	log_msg("Posint {}", {posint});
+	inttobit(pos , posint);
+	log_msg("!!!!!!!!!!!!!Pos {}", {pos});
 	checkerboard.read(ori_teste, pos);
-	teste = (BOOL_T)(bit<1>)(ori_teste == 0);
+	log_msg("Destino {}", {ori_teste});
+	verif = (BOOL_T)(bit<1>)(ori_teste == 0x30);
+	
+	/*Busca turno*/
+	bit<1> teste_verificaturno;
+	checkers_turn.read(teste_verificaturno, 0);
+	BOOL_T turn = (BOOL_T)(bit<1>) teste_verificaturno ;
+	
+	//Verificar se a casa de destino é valida 2 situacoes
+	//Caso 1: Casa adjacente está vazia = 0
+	//No turno das brancas - Casa tem que ser para baixo
+	BOOL_T andar;
+	andar = (BOOL_T)(bit<1>) 0;
+	if (turn == 0){
+		if( (rowint - rowinint) == 1){ //linha maior que a entrada por uma unidade
+			if(((colint - colinint) == 1) || ((colinint - colint) == 1)){
+				//Jogada valida
+				andar = (BOOL_T)(bit<1>) 1;
+			}
+		}
+	}
+	else{
+		if( (rowinint - rowint) == 1){ //linha menor que a entrada por uma unidade
+			if(((colint - colinint) == 1) || ((colinint - colint) == 1)){
+				//Jogada valida
+				andar = (BOOL_T)(bit<1>) 1;
+			}
+		}		
+	}
 		
+	//Caso 2: Comer (casa adjacente está com peça do adversario) e a proxima está vazia
+	BOOL_T comer;
+	comer = (BOOL_T)(bit<1>) 0;
+	
+	int<8> posadv;
+	bit<8> adversario;
+	posadv = 1;
+	
+	if (turn == 0){
+		if( (rowint - rowinint) == 2){ //linha maior que a entrada por uma unidade
+			if((colint - colinint) == 2) {
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowint-2)*8 + colint-2;
+			}
+			if((colinint - colint) == 2){
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowint-2)*8 + colint;
+			}
+		}
+	}
+	else{
+		if( (rowinint - rowint) == 2){ //linha menor que a entrada por uma unidade
+			if((colint - colinint) == 2) {
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowinint-2)*8 + colint-2;
+			}
+			if((colinint - colint) == 2){
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowinint-2)*8 + colint;
+			}
+		}		
+	}
+	
+	
+	
+	log_msg("!!!!!!!!POSADV {}", {posadv});
+	acharadversario(adversario, posadv);
+	
+	
+	if (turn == 0){
+		comer = (BOOL_T)(bit<1>)(adversario == 0x32);
+	}
+	else{
+		comer = (BOOL_T)(bit<1>)(adversario == 0x31);
+	}
+	
+	
+	
+	log_msg("Verif {}", {verif});
+	log_msg("Andar {}", {andar});
+	log_msg("Comer {}", {comer});
+	
+	
+	//Verif
+	verif = verif & ( andar | comer );
+	
 }
+
+
+
 
 
 action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 	
+	
+	log_msg("Entrou verificar jogada");
 	bit<8> rowin;
 	bit<8> colin;
 	bit<8> rowout;
@@ -267,7 +404,7 @@ action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 	colin = msg[47:40];
 	rowout = msg[31:24];
 	colout = msg[15:8];
-	
+	log_msg("Entrou verificar numeros");
 	verificarnumero(valida_rowin, rowin);
 	verificarnumero(valida_colin, colin);
 	verificarnumero(valida_rowout, rowout);
@@ -280,18 +417,116 @@ action verificarjogada(inout BOOL_T valida_jogada, in bit<64> msg){
 	BOOL_T verori;
 	BOOL_T verdest;
 	
+	log_msg("Verifica Origem");
 	verificaorigem(verori, rowin, colin);
-	verificadestino(verdest, rowout, colout);
+	log_msg("Verifica Destino");
+	verificadestino(verdest, rowout, colout, rowin, colin);
 	
 	BOOL_T verfin;
 	
-	verfin = (BOOL_T)(bit<1>)(verdest == verori);
+	verfin = verdest & verori;
+	log_msg("Verori {}", {verori});
+	log_msg("Vesdest {}", {verdest});
+	log_msg("Verfin {}", {verfin});
+	log_msg("Validajog_antes {}", {valida_jogada});
 	
-	valida_jogada = (BOOL_T)(bit<1>)(valida_jogada == verfin);
+	valida_jogada = valida_jogada & verfin;
+	log_msg("Validajog_depois {}", {valida_jogada});
 
 }
 
-
+action jogar(in bit<64> msg){
+	
+	log_msg("Entrou jogar");
+	bit<8> rowin;
+	bit<8> colin;
+	bit<8> rowout;
+	bit<8> colout;
+	
+	
+	rowin = msg[63:56];
+	colin = msg[47:40];
+	rowout = msg[31:24];
+	colout = msg[15:8];
+	
+	int<8> rowinint;
+	int<8> colinint;
+	bittoint(rowinint, rowin);
+	bittoint(colinint, colin);
+	
+	bit<32> pos;
+	int<8> posint;
+	
+	/*Posicao array*/ 
+	posint = (rowinint-1)*8 + colinint-1;
+	inttobit(pos , posint);
+	// Zera a origem
+	checkerboard.write(pos, 0x30);
+	
+	
+	int<8> rowoutint;
+	int<8> coloutint;
+	bittoint(rowoutint, rowout);
+	bittoint(coloutint, colout);
+	
+	posint = (rowoutint-1)*8 + coloutint-1;
+	inttobit(pos , posint);
+	
+	bit<8> peca;
+	bit<1> teste_verificaturno;
+	checkers_turn.read(teste_verificaturno, 0);
+	BOOL_T turn = (BOOL_T)(bit<1>) teste_verificaturno ;
+	if (turn == 0){ //BRANCAS
+		peca = 0x31;
+	}else{
+		peca= 0x32;
+	}
+	
+	checkerboard.write(pos, peca);
+	
+	//Se comer peca
+	
+	int<8> posadv;
+	bit<8> adversario;
+	posadv = 1;
+	
+	if (turn == 0){
+		if( (rowoutint - rowinint) == 2){ //linha maior que a entrada por uma unidade
+			if((coloutint - colinint) == 2) {
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowoutint-2)*8 + coloutint-2;
+			}
+			if((colinint - coloutint) == 2){
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowoutint-2)*8 + coloutint;
+			}
+		}
+	}
+	else{
+		if( (rowinint - rowoutint) == 2){ //linha menor que a entrada por uma unidade
+			if((coloutint - colinint) == 2) {
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowinint-2)*8 + coloutint-2;
+			}
+			if((colinint - coloutint) == 2){
+				//Verificar se casa anterior tem um adversario
+				posadv = (rowinint-2)*8 + coloutint;
+			}
+		}		
+	}
+	
+	bit<8> peca2;
+	bit<32> posadvb;
+	if (posadv ==1){
+		peca2 = 0x2d;
+	}
+	else{
+		peca2 = 0x30;
+	}
+	inttobit(posadvb , posadv);
+	checkerboard.write(posadvb, peca2);
+	
+}
 
 /*verifica_soma(bit<8> row, bit<8> col){
 	if (row[0] | col[0]) == 0){
